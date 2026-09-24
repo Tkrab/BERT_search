@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理控制台 - 航运文献检索系统</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body class="bg-gray-100">
+    <header class="bg-gray-800 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">管理控制台</h1>
+            <nav>
+                <a href="/" class="text-white hover:text-gray-300 ml-4">返回首页</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container mx-auto mt-8">
+        <!-- 用户管理部分 -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">用户管理</h2>
+                <!-- 移除添加用户按钮 -->
+            </div>
+            <div class="mb-4">
+                <input type="text" id="userSearch" placeholder="搜索用户..." class="w-full p-2 border rounded">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2">用户名</th>
+                            <th class="px-4 py-2">邮箱</th>
+                            <th class="px-4 py-2">VIP状态</th>
+                            <th class="px-4 py-2">用户角色</th>
+                            <th class="px-4 py-2">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userList">
+                        <!-- 用户列表将通过 JavaScript 动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-96 mx-auto mt-20">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4"></h3>
+            <div id="modalForm">
+                <!-- 表单内容将通过 JavaScript 动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/admin.js' %}"></script>
+</body>
+
+</html>

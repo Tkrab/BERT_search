@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>搜索结果 - 航运文献检索系统</title>
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+	<script src="{% static 'js/common.js' %}"></script>
+	<script src="{% static 'js/search.js' %}"></script>
+</head>
+
+<body class="bg-gray-50">
+	<header class="bg-gray-800 text-white p-4 flex justify-between items-center">
+		<div class="flex items-center space-x-4">
+			<!-- <h1 class="text-2xl font-bold">航运文献检索系统</h1> -->
+			<a href="/" class="text-2xl font-bold hover:text-gray-300">航运文献检索系统</a>
+		</div>
+		<div class="flex items-center space-x-4" id="userSection">
+			<!-- 用户状态将由 JS 动态填充 -->
+		</div>
+	</header>
+
+	<!-- 在 </body> 标签前添加以下脚本 -->
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const userSection = document.getElementById('userSection');
+			const user = JSON.parse(localStorage.getItem('user'));
+
+			if (user) {
+				let html = `
+                <div class="flex items-center space-x-4">
+                    <a href="/profile" class="text-white hover:text-gray-300">${user.username}</a>
+            `;
+
+				if (user.is_superuser || user.is_staff) {
+					html += `<a href="/admin" class="text-white hover:text-gray-300">管理控制台</a>`;
+				}
+
+				html += `
+                    <a href="/" class="text-white hover:text-gray-300">首页</a>
+                </div>
+            `;
+
+				userSection.innerHTML = html;
+			} else {
+				userSection.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <button id="loginButton" class="text-white hover:text-gray-300">登录</button>
+                    <button id="registerButton" class="text-white hover:text-gray-300">注册</button>
+                    <a href="/" class="text-white hover:text-gray-300">首页</a>
+                </div>
+            `;
+			}
+		});
+	</script>
+
+	<div class="search-page-container">
+		<div class="top-search-bar">
+			<div class="search-box-container">
+				<input type="text" class="main-search-input" placeholder="请输入搜索关键词" value="航运">
+				<button class="main-search-button">
+					<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
+					搜索
+				</button>
+			</div>
+			
+			<!-- 添加高级搜索选项 -->
+			<div class="advanced-search-options">
+				<div class="search-option">
+					<label for="author">作者：</label>
+					<input type="text" id="author" class="search-input" placeholder="输入作者姓名">
+				</div>
+				<div class="search-option">
+					<label for="publish-date-start">发表日期：</label>
+					<input type="date" id="publish-date-start" class="search-input date-input">
+					<span>至</span>
+					<input type="date" id="publish-date-end" class="search-input date-input">
+				</div>
+			</div>
+		</div>
+
+		<div class="main-content">
+			<div class="filter-sidebar">
+				<div class="filter-section">
+					<h3 class="filter-title">文献分类</h3>
+					<ul class="filter-list" id="categoryList">
+						<!-- 分类列表将由 JS 动态填充 -->
+					</ul>
+				</div>
+				<div class="filter-section">
+					<h3>来源类型</h3>
+					<ul class="filter-list" id="sourceTypeList">
+						<!-- 来源类型列表将由 JS 动态填充 -->
+					</ul>
+				</div>
+			</div>
+
+			<!-- 右侧搜索结果 -->
+			<div class="search-results">
+				<div class="results-toolbar">
+					<div class="results-count">找到 <span class="count-number">0</span> 条结果</div>
+				</div>
+
+				<!-- 在搜索结果区域上方添加 -->
+				<div id="loading-indicator" class="loading-container" style="display: none;">
+				    <div class="loading-spinner"></div>
+				    <p class="loading-text">正在搜索中，请稍候...</p>
+				</div>
+
+				<!-- 搜索结果列表 -->
+				<div class="results-list">
+				    <!-- 结果内容 -->
+				</div>
+				<div class="pagination">
+					<span class="page-info">第1/1页</span>
+					<div class="page-buttons">
+						<!-- 分页按钮将由 JS 动态生成 -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+
+</html>

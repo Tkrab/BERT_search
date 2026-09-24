@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文献详情 - 航运文献检索系统</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/article.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+
+<body class="bg-gray-50">
+    <header class="bg-gray-800 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <a href="/" class="text-2xl font-bold hover:text-gray-300">海运文献检索系统</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div id="userSection">
+                <!-- 用户状态将通过 JavaScript 动态更新 -->
+            </div>
+        </div>
+    </header>
+
+    <div class="article-container">
+        <!-- 文献基本信息 -->
+        <div class="article-info" data-article-id="{{ article.id }}">
+            <h1 class="article-title" id="articleTitle"></h1>
+
+            <div class="article-meta">
+                <div class="meta-item">
+                    <span class="meta-label">作者：</span>
+                    <span class="meta-value" id="articleAuthor"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">来源：</span>
+                    <span class="meta-value" id="articleSource"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">发表日期：</span>
+                    <span class="meta-value" id="articleDate"></span>
+                </div>
+            </div>
+
+            <div class="article-keywords">
+                <span class="meta-label">关键词：</span>
+                <div id="articleKeywords"></div>
+            </div>
+
+            <div class="article-abstract">
+                <h2>摘要</h2>
+                <p id="articleAbstract"></p>
+            </div>
+
+            <div class="article-actions">
+                <button class="action-button">下载全文</button>
+                <button class="action-button">导出引用</button>
+            </div>
+        </div>
+
+        <!-- 关系图谱 -->
+        <div class="article-graph">
+            <!-- <h2 class="graph-title">文献关系图谱</h2> -->
+            <div id="relationshipGraph" class="graph-container"></div>
+        </div>
+    </div>
+</body>
+
+</html>

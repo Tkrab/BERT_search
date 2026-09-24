@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人信息 - 航运文献检索系统</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+
+<body class="bg-gray-50">
+    <header class="bg-gray-800 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <!-- <h1 class="text-2xl font-bold">航运文献检索系统</h1> -->
+            <a href="/" class="text-2xl font-bold hover:text-gray-300">航运文献检索系统</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="/" class="text-white hover:text-gray-300">首页</a>
+            <div id="userSection"></div>
+        </div>
+    </header>
+
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6">个人信息管理</h2>
+
+        <!-- 基本信息表单 -->
+        <form id="profileForm" class="space-y-4 mb-8">
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2" for="username">用户名</label>
+                <input type="text" id="username" name="username" readonly
+                    class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2" for="email">邮箱</label>
+                <input type="email" id="email" name="email" required class="w-full px-3 py-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2" for="phone">手机号码</label>
+                <input type="tel" id="phone" name="phone" class="w-full px-3 py-2 border rounded-lg">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">会员状态</label>
+                <div id="vipStatus" class="text-lg font-semibold"></div>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                保存修改
+            </button>
+            <div id="errorMessage" class="text-red-500 text-center hidden"></div>
+            <div id="successMessage" class="text-green-500 text-center hidden"></div>
+        </form>
+
+        <!-- 添加修改密码表单 -->
+        <div class="border-t pt-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">修改密码</h3>
+            <form id="passwordForm" class="space-y-4">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="currentPassword">当前密码</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required
+                        class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="newPassword">新密码</label>
+                    <input type="password" id="newPassword" name="newPassword" required
+                        class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="confirmPassword">确认新密码</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required
+                        class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                    修改密码
+                </button>
+                <div id="passwordError" class="text-red-500 text-center hidden"></div>
+                <div id="passwordSuccess" class="text-green-500 text-center hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/${user.id}/`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (response.ok) {
+                    const userData = await response.json();
+                    document.getElementById('username').value = userData.username;
+                    document.getElementById('email').value = userData.email || '';
+                    document.getElementById('phone').value = userData.phone || '';
+                    document.getElementById('vipStatus').textContent =
+                        userData.is_vip ? '已开通会员' : '普通用户';
+                }
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+            }
+        });
+
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const user = JSON.parse(localStorage.getItem('user'));
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            try {
+                const response = await fetch(`/api/users/${user.id}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ email, phone })
+                });
+
+                if (response.ok) {
+                    successMessage.textContent = '个人信息更新成功';
+                    successMessage.classList.remove('hidden');
+                    errorMessage.classList.add('hidden');
+                } else {
+                    const data = await response.json();
+                    errorMessage.textContent = data.error || '更新失败';
+                    errorMessage.classList.remove('hidden');
+                    successMessage.classList.add('hidden');
+                }
+            } catch (error) {
+                errorMessage.textContent = '网络错误，请稍后重试';
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+            }
+        });
+
+        // 添加修改密码表单处理
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorMessage = document.getElementById('passwordError');
+            const successMessage = document.getElementById('passwordSuccess');
+
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = '两次输入的新密码不一致';
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`/api/users/${user.id}/change_password/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+
+                if (response.ok) {
+                    successMessage.textContent = '密码修改成功';
+                    successMessage.classList.remove('hidden');
+                    errorMessage.classList.add('hidden');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    const data = await response.json();
+                    errorMessage.textContent = data.error || '密码修改失败';
+                    errorMessage.classList.remove('hidden');
+                    successMessage.classList.add('hidden');
+                }
+            } catch (error) {
+                errorMessage.textContent = '网络错误，请稍后重试';
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!-- {% load static %} -->
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航运文献检索系统</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <script src="../static/js/common.js"></script>
+    <script src="../static/js/index.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body class="bg-white text-gray-900"> <!-- 移除 transition-colors duration-300 -->
+    <header class="bg-gray-800 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <!-- <h1 class="text-2xl font-bold">航运文献检索系统</h1> -->
+            <a href="/" class="text-2xl font-bold hover:text-gray-300">航运文献检索系统</a>
+        </div>
+        <div class="flex items-center">
+            <div id="userSection" class="flex space-x-4 ml-4">
+                <!-- 登录状态的按钮将通过 JS 动态插入 -->
+            </div>
+        </div>
+    </header>
+    <div class="search-container">
+        <form id="searchForm" class="flex items-center">
+            <input type="text" id="searchQuery" placeholder="搜索..." class="search-input">
+            <button type="submit" class="search-button">搜索</button>
+        </form>
+    </div>
+
+    <!-- 添加推荐区域，初始时隐藏 -->
+    <div id="recommendationsArea" class="recommendations-container hidden">
+        <div class="recommendations-wrapper">
+            <!-- 个性化推荐 -->
+            <div class="recommendation-section">
+                <h2 class="section-title">个性化推荐</h2>
+                <div id="personalRecommendations" class="recommendation-list">
+                    <!-- 内容将由 JavaScript 动态填充 -->
+                </div>
+            </div>
+
+            <!-- 热门推荐 -->
+            <div class="recommendation-section">
+                <h2 class="section-title">热门推荐</h2>
+                <div id="popularRecommendations" class="recommendation-list">
+                    <!-- 内容将由 JavaScript 动态填充 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const userSection = document.getElementById('userSection');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (user) {
+            let html = `
+            <div class="flex items-center space-x-4">
+                <a href="/profile" class="text-white hover:text-gray-300">${user.username}</a>
+            `;
+
+            if (user.is_superuser || user.is_staff) {
+                html += `<a href="/admin" class="text-white hover:text-gray-300">管理控制台</a>`;
+            }
+
+            html += `
+                <button onclick="logout()" class="text-white hover:text-gray-300">退出</button>
+            </div>
+            `;
+
+            userSection.innerHTML = html;
+
+            // 添加这行：用户登录时初始化推荐
+            initRecommendations();
+
+        } else {
+            userSection.innerHTML = `
+            <button id="loginButton" class="text-white hover:text-gray-300">登录</button>
+            <button id="registerButton" class="text-white hover:text-gray-300">注册</button>
+        `;
+
+            // 添加按钮点击事件监听
+            const loginButton = document.getElementById('loginButton');
+            const registerButton = document.getElementById('registerButton');
+
+            if (loginButton) {
+                loginButton.addEventListener('click', () => {
+                    window.location.href = '/login';
+                });
+            }
+
+            if (registerButton) {
+                registerButton.addEventListener('click', () => {
+                    window.location.href = '/register';
+                });
+            }
+        }
+    });
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';  // 修改为跳转到主页
+    }
+</script>
